@@ -86,6 +86,17 @@
                     <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Si seleccionas Profesor o Administrador, introduce el código que te proporcionó el centro.</p>
                 </div>
 
+                <div id="cedula-group" class="{{ old('role') == 'student' || old('role') == '' ? '' : 'hidden' }}">
+                    <label for="cedula" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cédula de Identidad</label>
+                    <div class="mt-1">
+                        <input id="cedula" name="cedula" type="text" value="{{ old('cedula') }}" class="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white">
+                    </div>
+                    @error('cedula')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Requerido para estudiantes. Debe haber sido autorizada previamente por un administrador o profesor.</p>
+                </div>
+
                 <div>
                     <label for="avatar" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Avatar (opcional)</label>
                     <div class="mt-1">
@@ -132,21 +143,34 @@
     document.addEventListener('DOMContentLoaded', function () {
         const roleSelect = document.getElementById('role');
         const tokenGroup = document.getElementById('token-group');
-        function toggleToken() {
+        const cedulaGroup = document.getElementById('cedula-group');
+
+        function toggleFields() {
             if (!roleSelect) return;
             const v = roleSelect.value;
+            
+            // Token logic
             if (v === 'teacher' || v === 'admin') {
                 tokenGroup.classList.remove('hidden');
             } else {
                 tokenGroup.classList.add('hidden');
-                // clear token input when hidden
                 const input = tokenGroup.querySelector('input[name="registration_token"]');
                 if (input) input.value = '';
             }
+
+            // Cedula logic
+            if (v === 'student') {
+                cedulaGroup.classList.remove('hidden');
+            } else {
+                cedulaGroup.classList.add('hidden');
+                const input = cedulaGroup.querySelector('input[name="cedula"]');
+                if (input) input.value = '';
+            }
         }
+
         if (roleSelect) {
-            roleSelect.addEventListener('change', toggleToken);
-            toggleToken();
+            roleSelect.addEventListener('change', toggleFields);
+            toggleFields();
         }
     });
 </script>

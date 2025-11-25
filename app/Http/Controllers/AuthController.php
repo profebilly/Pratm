@@ -56,15 +56,37 @@ class AuthController extends Controller
             'role' => ['required', 'in:admin,teacher,student,parent'],
             'avatar' => ['nullable', 'image', 'max:2048'],
             'registration_token' => ['nullable', 'string'],
+            'cedula' => ['nullable', 'string', 'unique:users,cedula'],
         ]);
 
         $role = $request->input('role');
 
         // If the creator is not an admin, require a valid registration token for teacher/admin
         if (!$isAdmin && in_array($role, ['teacher', 'admin'])) {
-            $expected = $role === 'teacher' ? env('TEACHER_REGISTRATION_TOKEN') : env('ADMIN_REGISTRATION_TOKEN');
+            $key = $role === 'teacher' ? 'teacher_registration_token' : 'admin_registration_token';
+            // Get token from DB settings, fallback to env if not found (though migration should have seeded it)
+            $expected = \App\Models\Setting::get($key, $role === 'teacher' ? env('TEACHER_REGISTRATION_TOKEN') : env('ADMIN_REGISTRATION_TOKEN'));
+            
             if (empty($expected) || $request->input('registration_token') !== $expected) {
                 return back()->withErrors(['registration_token' => 'Código de registro inválido para el rol seleccionado.'])->withInput();
+            }
+        }
+
+        // Validate Cedula for Students
+        if ($role === 'student') {
+            $cedula = $request->input('cedula');
+            if (empty($cedula)) {
+                return back()->withErrors(['cedula' => 'La cédula es obligatoria para estudiantes.'])->withInput();
+            }
+
+            $allowed = \App\Models\AllowedStudent::where('cedula', $cedula)->first();
+
+            if (!$allowed) {
+                return back()->withErrors(['cedula' => 'Esta cédula no está autorizada para registrarse.'])->withInput();
+            }
+
+            if ($allowed->is_registered) {
+                return back()->withErrors(['cedula' => 'Esta cédula ya ha sido registrada.'])->withInput();
             }
         }
 
@@ -79,7 +101,12 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'role' => $role,
             'avatar' => $avatarPath,
+            'cedula' => $request->cedula,
         ]);
+
+        if ($role === 'student' && isset($allowed)) {
+            $allowed->update(['is_registered' => true]);
+        }
 
         // If current user is admin, don't login as the new user
         if ($isAdmin) {

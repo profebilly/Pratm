@@ -22,7 +22,7 @@ class RoleMiddleware
             return redirect('login');
         }
 
-        if (Auth::user()->role !== $role) {
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== $role) {
             abort(403, 'Unauthorized action.');
         }
 
