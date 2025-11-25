@@ -112,5 +112,6 @@
 
     {{-- Scripts from child views --}}
     @yield('scripts')
+    
 </body>
 </html>

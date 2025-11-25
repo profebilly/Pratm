@@ -1,4 +1,4 @@
-@extends('layouts.blog')  {{-- Cambié a tu layout principal --}}
+@extends('layouts.blog')
 
 @section('title', 'Panel del Profesor')
 
@@ -90,13 +90,21 @@
                     </a>
                     
                     <a href="{{ route('teacher.students') }}" class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-    </svg>
-    Ver Estudiantes
-</a>
+                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        Ver Estudiantes
+                    </a>
 
-                    <a href="#" class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                    <!-- NUEVO: Botón para autorizar estudiante con padre/tutor -->
+                    <button onclick="openAuthorizationModal()" class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Autorizar Nuevo Estudiante
+                    </button>
+
+                    <a href="{{ route('teacher.materials') }}" class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
                         <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
@@ -240,4 +248,184 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para Autorizar Estudiante - DENTRO DEL CONTENT -->
+<div id="authorizationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 lg:w-1/3 shadow-lg rounded-md bg-white dark:bg-gray-800">
+        <div class="mt-3">
+            <!-- Header -->
+            <div class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Autorizar Nuevo Estudiante</h3>
+                <button onclick="closeAuthorizationModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form class="space-y-4 mt-4" action="{{ route('allowed_students.store') }}" method="POST">
+                @csrf
+                
+                <!-- Cédula del estudiante -->
+                <div>
+                    <label for="student_cedula" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Cédula del Estudiante
+                    </label>
+                    <div class="mt-1">
+                        <input id="student_cedula" name="student_cedula" type="text" required 
+                               class="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+                               placeholder="Ingrese la cédula del estudiante">
+                    </div>
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        Ingrese la cédula del estudiante para permitir su registro en la plataforma.
+                    </p>
+                </div>
+
+                <!-- Opción para agregar padre/tutor -->
+                <div class="border-t pt-4 mt-4">
+                    <div class="mb-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="add_parent" name="add_parent" value="1" 
+                                   class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                También autorizar padre/madre o tutor para este estudiante
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Campos del padre (ocultos inicialmente) -->
+                    <div id="parent-fields" class="hidden space-y-4 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <div>
+                            <label for="parent_cedula" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Cédula del Padre/Tutor
+                            </label>
+                            <div class="mt-1">
+                                <input id="parent_cedula" name="parent_cedula" type="text" 
+                                       class="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+                                       placeholder="Ingrese la cédula del padre/tutor">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="parent_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Nombre del Padre/Tutor
+                            </label>
+                            <div class="mt-1">
+                                <input id="parent_name" name="parent_name" type="text" 
+                                       class="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+                                       placeholder="Ingrese el nombre completo">
+                            </div>
+                        </div>
+
+                        <!-- Números de contacto (reemplazan el email) -->
+                        <div>
+                            <label for="parent_phone_1" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Número de Contacto 1
+                            </label>
+                            <div class="mt-1">
+                                <input id="parent_phone_1" name="parent_phone_1" type="tel" 
+                                       class="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+                                       placeholder="Ej: 0412-1234567">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="parent_phone_2" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Número de Contacto 2 (opcional)
+                            </label>
+                            <div class="mt-1">
+                                <input id="parent_phone_2" name="parent_phone_2" type="tel" 
+                                       class="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
+                                       placeholder="Ej: 0424-9876543">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeAuthorizationModal()" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-md hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Autorizar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection
+
+{{-- Scripts directamente en la vista para evitar problemas --}}
+@section('scripts')
+<script>
+// Funciones para el modal
+function openAuthorizationModal() {
+    console.log('Abriendo modal...'); // Para debug
+    document.getElementById('authorizationModal').classList.remove('hidden');
+}
+
+function closeAuthorizationModal() {
+    console.log('Cerrando modal...'); // Para debug
+    document.getElementById('authorizationModal').classList.add('hidden');
+    // Resetear el formulario
+    document.getElementById('add_parent').checked = false;
+    document.getElementById('parent-fields').classList.add('hidden');
+    // Limpiar campos requeridos
+    document.getElementById('parent_cedula').required = false;
+    document.getElementById('parent_name').required = false;
+    document.getElementById('parent_phone_1').required = false;
+    document.getElementById('parent_phone_2').required = false;
+}
+
+// Inicializar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM cargado - inicializando modal...'); // Para debug
+    
+    const addParentCheckbox = document.getElementById('add_parent');
+    const parentFields = document.getElementById('parent-fields');
+    const modal = document.getElementById('authorizationModal');
+
+    if (addParentCheckbox && parentFields) {
+        addParentCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                parentFields.classList.remove('hidden');
+                // Hacer requeridos los campos del padre
+                document.getElementById('parent_cedula').required = true;
+                document.getElementById('parent_name').required = true;
+                document.getElementById('parent_phone_1').required = true;
+                // El segundo teléfono es opcional
+                document.getElementById('parent_phone_2').required = false;
+            } else {
+                parentFields.classList.add('hidden');
+                // Quitar requerido de los campos del padre
+                document.getElementById('parent_cedula').required = false;
+                document.getElementById('parent_name').required = false;
+                document.getElementById('parent_phone_1').required = false;
+                document.getElementById('parent_phone_2').required = false;
+            }
+        });
+    }
+
+    // Cerrar modal al hacer click fuera
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target.id === 'authorizationModal') {
+                closeAuthorizationModal();
+            }
+        });
+    }
+
+    // Cerrar modal con ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeAuthorizationModal();
+        }
+    });
+});
+</script>
 @endsection

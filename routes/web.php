@@ -19,6 +19,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [App\Http\Controllers\PostController::class, 'index'])->name('home');
 Route::get('/posts/{slug}', [App\Http\Controllers\PostController::class, 'show'])->name('posts.show');
 
+// ✅ RUTA ABOUT - MOVIDA FUERA DEL MIDDLEWARE AUTH (PÚBLICA)
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
 });
@@ -69,6 +74,8 @@ Route::middleware(['auth'])->group(function () {
     // Student-Parent Relationship
     Route::post('/student-parent', [App\Http\Controllers\StudentParentController::class, 'store'])->name('student_parent.store');
     Route::delete('/student-parent', [App\Http\Controllers\StudentParentController::class, 'destroy'])->name('student_parent.destroy');
+
+    // ❌ ELIMINADA: La ruta about ya no está aquí dentro
 }); // <- ESTE ES EL CIERRE DEL GRUPO AUTH PRINCIPAL
 
 require __DIR__.'/auth.php';
