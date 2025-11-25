@@ -94,7 +94,9 @@
                     @error('cedula')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror
-                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Requerido para estudiantes. Debe haber sido autorizada previamente por un administrador o profesor.</p>
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        <span id="cedula-text">Requerido para estudiantes. Debe haber sido autorizada previamente por un administrador o profesor.</span>
+                    </p>
                 </div>
 
                 <div>
@@ -144,6 +146,7 @@
         const roleSelect = document.getElementById('role');
         const tokenGroup = document.getElementById('token-group');
         const cedulaGroup = document.getElementById('cedula-group');
+        const cedulaText = document.getElementById('cedula-text');
 
         function toggleFields() {
             if (!roleSelect) return;
@@ -158,9 +161,16 @@
                 if (input) input.value = '';
             }
 
-            // Cedula logic
-            if (v === 'student') {
+            // Cedula logic - MODIFICADO: ahora también para 'parent'
+            if (v === 'student' || v === 'parent') {
                 cedulaGroup.classList.remove('hidden');
+                
+                // Actualizar texto según el rol
+                if (v === 'student') {
+                    cedulaText.textContent = 'Requerido para estudiantes. Debe haber sido autorizada previamente por un administrador o profesor.';
+                } else if (v === 'parent') {
+                    cedulaText.textContent = 'Requerido para padres, madres o tutores. Debe haber sido autorizada previamente por un administrador o profesor.';
+                }
             } else {
                 cedulaGroup.classList.add('hidden');
                 const input = cedulaGroup.querySelector('input[name="cedula"]');
